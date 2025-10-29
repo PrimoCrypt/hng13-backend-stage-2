@@ -122,7 +122,7 @@ export class CountriesService {
           name,
           capital,
           region,
-          population: String(population),
+          population,
           currency_code,
           exchange_rate,
           estimated_gdp,

@@ -22,8 +22,15 @@ export class Country {
   @Column({ type: 'varchar', length: 128, nullable: true })
   region!: string | null;
 
-  @Column({ type: 'bigint', unsigned: true })
-  population!: string;
+  @Column({
+    type: 'bigint',
+    unsigned: true,
+    transformer: {
+      to: (value: number | string): string => String(value ?? 0),
+      from: (value: string): number => Number(value ?? 0),
+    },
+  })
+  population!: number;
 
   @Column({ name: 'currency_code', type: 'varchar', length: 8, nullable: true })
   currency_code!: string | null;
