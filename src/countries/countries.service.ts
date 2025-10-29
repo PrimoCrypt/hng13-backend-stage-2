@@ -161,10 +161,10 @@ export class CountriesService {
     const sort = query.sort || 'name_asc';
     switch (sort) {
       case 'gdp_desc':
-        qb.orderBy('country.estimated_gdp', 'DESC');
+        qb.orderBy('COALESCE(country.estimated_gdp, 0)', 'DESC');
         break;
       case 'gdp_asc':
-        qb.orderBy('country.estimated_gdp', 'ASC');
+        qb.orderBy('COALESCE(country.estimated_gdp, 0)', 'ASC');
         break;
       case 'population_desc':
         qb.orderBy('CAST(country.population AS UNSIGNED)', 'DESC');
@@ -209,7 +209,7 @@ export class CountriesService {
     const total = await this.countryRepo.count();
     const last = await this.countryRepo
       .createQueryBuilder('country')
-      .select('MAX(country.lastRefreshedAt)', 'max')
+      .select('MAX(country.last_refreshed_at)', 'max')
       .getRawOne<{ max: Date | null }>();
     const ts = last?.max ? new Date(last.max).toISOString() : null;
     return { total_countries: total, last_refreshed_at: ts };
