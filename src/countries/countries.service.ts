@@ -1,5 +1,5 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
@@ -29,9 +29,9 @@ export class CountriesService {
   constructor(
     @InjectRepository(Country)
     private readonly countryRepo: Repository<Country>,
+    private readonly configService: ConfigService,
     private readonly dataSource: DataSource,
     private readonly http: HttpService,
-    private readonly configService: ConfigService,
   ) {}
 
   private getCacheDir(): string {
@@ -45,6 +45,9 @@ export class CountriesService {
   async refresh(): Promise<{ total: number; lastRefreshedAt: string }> {
     const countriesUrl = this.configService.get<string>('COUNTRIES_API_URL');
     const ratesUrl = this.configService.get<string>('EXCHANGE_RATES_API_URL');
+
+    console.log({ countriesUrl, ratesUrl });
+
     if (!countriesUrl || !ratesUrl) {
       throw new ServiceUnavailableException({
         error: 'External data source unavailable',

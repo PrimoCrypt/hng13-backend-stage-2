@@ -8,7 +8,8 @@ import { Country } from './countries/country.entity';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
+      envFilePath: ['.env', '.env.local'],
+      ignoreEnvFile: false,
     }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
