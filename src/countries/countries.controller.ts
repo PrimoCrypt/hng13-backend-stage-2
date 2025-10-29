@@ -50,6 +50,19 @@ export class CountriesController {
     return this.countriesService.findAll(query);
   }
 
+  @Get('countries/image')
+  async getImage(@Res() res: Response) {
+    const imagePath = this.countriesService.getSummaryImagePath();
+    try {
+      await fs.access(imagePath);
+    } catch {
+      res.status(404).json({ error: 'Summary image not found' });
+      return;
+    }
+    res.type('image/png');
+    res.sendFile(imagePath);
+  }
+
   @Get('countries/:name')
   async getOne(@Param('name') name: string) {
     const found = await this.countriesService.findOneByName(name);
@@ -72,18 +85,5 @@ export class CountriesController {
   @Get('status')
   async status() {
     return this.countriesService.getStatus();
-  }
-
-  @Get('countries/image')
-  async getImage(@Res() res: Response) {
-    const imagePath = this.countriesService.getSummaryImagePath();
-    try {
-      await fs.access(imagePath);
-    } catch {
-      res.status(404).json({ error: 'Summary image not found' });
-      return;
-    }
-    res.type('image/png');
-    res.sendFile(imagePath);
   }
 }

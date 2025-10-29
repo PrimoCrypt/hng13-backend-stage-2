@@ -92,29 +92,29 @@ export class CountriesService {
         const population: number = Number(c.population ?? 0) || 0;
         const flagUrl: string | null = c.flag ?? null;
 
-        let currencyCode: string | null = null;
+        let currency_code: string | null = null;
         if (Array.isArray(c.currencies) && c.currencies.length > 0) {
           const first = c.currencies[0] ?? null;
-          currencyCode = first?.code ?? null;
+          currency_code = first?.code ?? null;
         }
 
-        let exchangeRate: number | null = null;
-        let estimatedGdp: number | null = null;
-        if (!currencyCode) {
-          exchangeRate = null;
-          estimatedGdp = 0;
+        let exchange_rate: number | null = null;
+        let estimated_gdp: number | null = null;
+        if (!currency_code) {
+          exchange_rate = null;
+          estimated_gdp = 0;
         } else {
-          const rate = ratesData?.[currencyCode];
+          const rate = ratesData?.[currency_code];
           if (typeof rate === 'number') {
-            exchangeRate = rate;
+            exchange_rate = rate;
             const multiplier = Math.floor(Math.random() * 1001) + 1000;
-            estimatedGdp =
-              exchangeRate > 0
-                ? (population * multiplier) / exchangeRate
+            estimated_gdp =
+              exchange_rate > 0
+                ? (population * multiplier) / exchange_rate
                 : null;
           } else {
-            exchangeRate = null;
-            estimatedGdp = null;
+            exchange_rate = null;
+            estimated_gdp = null;
           }
         }
 
@@ -123,11 +123,11 @@ export class CountriesService {
           capital,
           region,
           population: String(population),
-          currencyCode,
-          exchangeRate,
-          estimatedGdp,
-          flagUrl,
-          lastRefreshedAt: now,
+          currency_code,
+          exchange_rate,
+          estimated_gdp,
+          flag_url: flagUrl,
+          last_refreshed_at: now,
         });
       }
 
@@ -153,7 +153,7 @@ export class CountriesService {
       qb.andWhere('country.region = :region', { region: query.region });
     }
     if (query.currency) {
-      qb.andWhere('country.currencyCode = :currency', {
+      qb.andWhere('country.currency_code = :currency', {
         currency: query.currency,
       });
     }
@@ -161,10 +161,10 @@ export class CountriesService {
     const sort = query.sort || 'name_asc';
     switch (sort) {
       case 'gdp_desc':
-        qb.orderBy('country.estimatedGdp', 'DESC');
+        qb.orderBy('country.estimated_gdp', 'DESC');
         break;
       case 'gdp_asc':
-        qb.orderBy('country.estimatedGdp', 'ASC');
+        qb.orderBy('country.estimated_gdp', 'ASC');
         break;
       case 'population_desc':
         qb.orderBy('CAST(country.population AS UNSIGNED)', 'DESC');
@@ -219,8 +219,8 @@ export class CountriesService {
     const total = await this.countryRepo.count();
     const top5 = await this.countryRepo
       .createQueryBuilder('country')
-      .where('country.estimatedGdp IS NOT NULL')
-      .orderBy('country.estimatedGdp', 'DESC')
+      .where('country.estimated_gdp IS NOT NULL')
+      .orderBy('country.estimated_gdp', 'DESC')
       .take(5)
       .getMany();
 
@@ -247,7 +247,7 @@ export class CountriesService {
     const startY = 200;
     const lineH = 26;
     top5.forEach((c, idx) => {
-      const gdp = c.estimatedGdp ?? 0;
+      const gdp = c.estimated_gdp ?? 0;
       const line = `${idx + 1}. ${c.name} — ${gdp.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
       ctx.fillText(line, 24, startY + idx * lineH);
     });
